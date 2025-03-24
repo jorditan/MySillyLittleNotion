@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   open: boolean
@@ -59,4 +59,10 @@ const submitValue = () => {
 
   inputValue.value = ''
 }
+
+watch(props, ({ open }) => {
+  if (open) {
+    inputRef.value?.focus()
+  }
+})
 </script>

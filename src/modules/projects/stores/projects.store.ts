@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { Project } from '../interfaces/projects.interface'
+import { v4 as uuidv4 } from 'uuid'
+import { useLocalStorage } from '@vueuse/core'
 
 const initialLoad = (): Project[] => {
+  const projects = localStorage.getItem('projects') ?? []
+
   return [
     {
       id: '1',
@@ -18,6 +22,27 @@ const initialLoad = (): Project[] => {
 }
 
 export const useProjectsStore = defineStore('projects', () => {
-  const projects = ref<Project[]>(initialLoad())
-  return { projects }
+  const projects = ref(useLocalStorage<Project[]>('projects', []))
+
+  const addProyect = (name: string) => {
+    if (name.length == 0) return
+
+    projects.value.push({
+      id: uuidv4(),
+      name: name,
+      task: [],
+    })
+  }
+
+  return {
+    // Properties
+    projects,
+
+    // Getters - Así los vamos a usar, computados
+    projectList: computed(() => [...projects.value]),
+    emptyProjects: computed(() => projects.value.length === 0),
+
+    // Actions
+    addProyect,
+  }
 })

@@ -32,11 +32,11 @@
     text="Está a punto de crear un nuevo proyecto. Para continuar, ingrese su nombre"
     :open="modalOpen"
     @close="modalOpen = false"
-    @value="onNewValue"
+    @value="projectStore.addProyect"
     place-holder="Ingrese el nombre del proyecto"
   />
 
-  <custom-modal :open="customModalOpen">
+  <!-- <custom-modal :open="customModalOpen">
     <template #header>
       <h1 class="text-2xl">Título del modal</h1>
     </template>
@@ -53,7 +53,7 @@
         <button class="btn btn-primary">Aceptar</button>
       </div>
     </template>
-  </custom-modal>
+  </custom-modal> -->
 
   <fab-button @click="modalOpen = true">
     <AddIcon />
@@ -68,7 +68,7 @@
 import FabButton from '@/modules/common/components/FabButton.vue'
 import MyInputModal from '@/modules/common/components/MyInputModal.vue'
 import AddIcon from '@/modules/common/icons/AddIcon.vue'
-import CustomModal from '@/modules/common/components/CustomModal.vue'
+// import CustomModal from '@/modules/common/components/CustomModal.vue'
 import { ref } from 'vue'
 import { useProjectsStore } from '../stores/projects.store'
 
@@ -77,10 +77,4 @@ const customModalOpen = ref(false)
 
 // Si usásemos la desestructuración perderíamos lo ractivo
 const projectStore = useProjectsStore()
-
-c
-
-const onNewValue = (projectName: String) => {
-  console.log({ projectName })
-}
 </script>
