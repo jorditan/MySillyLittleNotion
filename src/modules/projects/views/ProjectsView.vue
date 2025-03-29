@@ -13,14 +13,44 @@
       <tbody>
         <tr
           class="hover:bg-base-300"
-          v-for="(project, index) in projectStore.projects"
+          v-for="(project, index) in projectStore.projectsWithCompletion"
           :key="project.id"
         >
           <th>{{ index + 1 }}</th>
-          <td>{{ project.name }}</td>
-          <td>{{ project.task.length }}</td>
-          <td>
-            <progress class="progress progress-primary w-full" value="10" max="100"></progress>
+          <td
+            class="w-2/4"
+            @mouseover="hoverStates[project.id] = true"
+            @mouseleave="hoverStates[project.id] = false"
+          >
+            <template v-if="currentEditingId !== project.id">
+              <div class="flex justify-between">
+                {{ project.name }}
+                <EditIcon
+                  openTooltip
+                  tooltipText="Editar proyecto"
+                  v-if="hoverStates[project.id]"
+                  @click="starEditing(project.id, project.name)"
+                />
+              </div>
+            </template>
+            <input
+              v-else
+              type="text"
+              class="input input-primary w-full transition-all opacity-60 hover:opacity-100 focus:opacity-100"
+              :placeholder="project.name"
+              v-model="newName"
+              @keyup.enter="saveEdit(project.id)"
+              @blur="cancelEdit()"
+            />
+          </td>
+          <td>{{ project.taskCount }}</td>
+          <td class="flex gap-2 items-center">
+            <progress
+              class="progress progress-primary w-full"
+              :value="project.completion"
+              max="100"
+            ></progress>
+            <p class="text-left w-2/4 font-semibold">{{ project.completion }}%</p>
           </td>
         </tr>
       </tbody>
@@ -69,11 +99,34 @@ import FabButton from '@/modules/common/components/FabButton.vue'
 import MyInputModal from '@/modules/common/components/MyInputModal.vue'
 import AddIcon from '@/modules/common/icons/AddIcon.vue'
 // import CustomModal from '@/modules/common/components/CustomModal.vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useProjectsStore } from '../stores/projects.store'
+import EditIcon from '@/modules/common/icons/EditIcon.vue'
 
-const modalOpen = ref(false)
-const customModalOpen = ref(false)
+const modalOpen = ref<boolean>(false)
+const customModalOpen = ref<boolean>(false)
+
+// Edición de proyectos por fila
+const currentEditingId = ref<string | null>(null)
+const newName = ref<string>('')
+
+const hoverStates = reactive<Record<string, boolean>>({})
+
+const starEditing = (projectId: string, name: string) => {
+  currentEditingId.value = projectId // Activar edición solo en esta fila
+  newName.value = name // Inicializar con el nombre actual
+}
+
+const cancelEdit = () => {
+  currentEditingId.value = null
+}
+
+const saveEdit = (projectId: string) => {
+  if (newName.value.trim() !== '') {
+    projectStore.editProject(projectId, newName.value)
+  }
+  currentEditingId.value = null
+}
 
 // Si usásemos la desestructuración perderíamos lo ractivo
 const projectStore = useProjectsStore()

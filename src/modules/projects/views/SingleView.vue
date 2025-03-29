@@ -15,10 +15,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="hover:bg-base-300">
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
+            <tr v-for="task in project?.task" :key="task.id" class="hover:bg-base-300">
+              <th>
+                <input
+                  type="checkbox"
+                  :checked="!!task.completedAt"
+                  class="checkbox"
+                  @change="projectStore.toggleTask(project!.id, task.id)"
+                />
+              </th>
+
+              <td>{{ task.name }}</td>
+              <td v-if="!task.completedAt"><RemoveIcon /></td>
+              <td v-else>{{ task.completedAt }}</td>
             </tr>
 
             <tr class="hover:bg-base-300">
@@ -28,6 +37,8 @@
                   type="text"
                   class="input input-primary w-full transition-all opacity-60 hover:opacity-100 focus:opacity-100"
                   placeholder="Nueva tarea"
+                  v-model="newTask"
+                  @keyup.enter="addTask"
                 />
               </td>
               <td></td>
@@ -46,6 +57,7 @@ import { useRouter } from 'vue-router'
 import BreadCrums from '@/modules/common/components/BreadCrums.vue'
 import { useProjectsStore } from '../stores/projects.store'
 import type { Project } from '../interfaces/projects.interface'
+import RemoveIcon from '@/modules/common/icons/RemoveIcon.vue'
 
 interface Props {
   id: string
@@ -55,6 +67,13 @@ const router = useRouter()
 const projectStore = useProjectsStore()
 const props = defineProps<Props>()
 const project = ref<Project | undefined>()
+const newTask = ref('')
+
+const addTask = () => {
+  if (!project.value) return
+  projectStore.addTaskToProject(project.value?.id, newTask.value)
+  newTask.value = ''
+}
 
 watch(
   () => props.id,
