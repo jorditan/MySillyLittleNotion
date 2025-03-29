@@ -52,6 +52,13 @@
             ></progress>
             <p class="text-left w-2/4 font-semibold">{{ project.completion }}%</p>
           </td>
+          <td class="w-[5%]">
+            <DeleteIcon
+              openTooltip
+              tooltipText="Eliminar"
+              @click="((deleteOpen = true), (deleteId = project.id))"
+            />
+          </td>
         </tr>
       </tbody>
     </table>
@@ -64,6 +71,14 @@
     @close="modalOpen = false"
     @value="projectStore.addProyect"
     place-holder="Ingrese el nombre del proyecto"
+  />
+
+  <delete-modal
+    tittle="Eliminar proyecto"
+    text="Estás a punto de eliminar un proyecto. Esta acción NO tiene vuelta atrás"
+    :open="deleteOpen"
+    @delete="projectStore.deleteProject(deleteId)"
+    @close="deleteOpen = false"
   />
 
   <!-- <custom-modal :open="customModalOpen">
@@ -85,11 +100,7 @@
     </template>
   </custom-modal> -->
 
-  <fab-button @click="modalOpen = true">
-    <AddIcon />
-  </fab-button>
-
-  <fab-button @click="customModalOpen = true" position="bottom-left">
+  <fab-button openTooltip tooltip-text="Nuevo proyecto" @click="modalOpen = true">
     <AddIcon />
   </fab-button>
 </template>
@@ -97,6 +108,8 @@
 <script lang="ts" setup>
 import FabButton from '@/modules/common/components/FabButton.vue'
 import MyInputModal from '@/modules/common/components/MyInputModal.vue'
+import DeleteModal from '@/modules/common/components/DeleteModal.vue'
+import DeleteIcon from '@/modules/common/icons/DeleteIcon.vue'
 import AddIcon from '@/modules/common/icons/AddIcon.vue'
 // import CustomModal from '@/modules/common/components/CustomModal.vue'
 import { reactive, ref } from 'vue'
@@ -104,7 +117,9 @@ import { useProjectsStore } from '../stores/projects.store'
 import EditIcon from '@/modules/common/icons/EditIcon.vue'
 
 const modalOpen = ref<boolean>(false)
-const customModalOpen = ref<boolean>(false)
+const deleteOpen = ref<boolean>(false)
+
+const deleteId = ref<string>('')
 
 // Edición de proyectos por fila
 const currentEditingId = ref<string | null>(null)

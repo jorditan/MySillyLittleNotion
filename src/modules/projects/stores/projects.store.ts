@@ -42,6 +42,12 @@ export const useProjectsStore = defineStore('projects', () => {
     project.name = newName
   }
 
+  const deleteProject = (projectId: string) => {
+    const project = projects.value.find((p) => p.id === projectId)
+
+    projects.value = projects.value.filter((p) => p.id !== project!.id)
+  }
+
   const addTaskToProject = (projectId: string, taskName: string) => {
     if (taskName.trim().length === 0) return
 
@@ -91,5 +97,6 @@ export const useProjectsStore = defineStore('projects', () => {
     addTaskToProject,
     toggleTask,
     editProject,
+    deleteProject,
   }
 })

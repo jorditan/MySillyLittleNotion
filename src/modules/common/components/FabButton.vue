@@ -1,12 +1,19 @@
 <template>
-  <button @click="$emit('click')" :class="['btn btn-circle bg-gray-400 p-1 fixed', props.position]">
-    <slot />
-  </button>
+  <div
+    :class="{ tooltip: openTooltip, fixed: true, [props.position]: true }"
+    :data-tip="openTooltip ? props.tooltipText : null"
+  >
+    <button @click="$emit('click')" :class="['btn btn-circle bg-slate-700 p-1']">
+      <slot />
+    </button>
+  </div>
 </template>
 
 <script lang="ts" setup>
 interface Props {
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  openTooltip?: boolean
+  tooltipText?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
